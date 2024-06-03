@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -44,11 +43,11 @@ func TestAddGetDelete(t *testing.T) {
 	id, err := store.Add(parcel)
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
-
 	// get
 	// получите только что добавленную посылку, убедитесь в отсутствии ошибки
 	// проверьте, что значения всех полей в полученном объекте совпадают со значениями полей в переменной parcel
 	line, err := store.Get(id)
+	parcel.Number = line.Number
 	require.NoError(t, err)
 	require.Equal(t, parcel, line)
 	// delete
@@ -138,7 +137,7 @@ func TestGetByClient(t *testing.T) {
 	parcels[1].Client = client
 	parcels[2].Client = client
 
-	// add
+	//add
 	for i := 0; i < len(parcels); i++ {
 		id, err := store.Add(parcels[i]) // добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 		require.NoError(t, err)
@@ -155,17 +154,10 @@ func TestGetByClient(t *testing.T) {
 	storedParcels, err := store.GetByClient(client)    // получите список посылок по идентификатору клиента, сохранённого в переменной client
 	require.NoError(t, err)                            // убедитесь в отсутствии ошибки
 	require.Equal(t, len(parcels), len(storedParcels)) // убедитесь, что количество полученных посылок совпадает с количеством добавленных
-	fmt.Print(parcelMap)
 	// check
 	require.NotEmpty(t, storedParcels)
-	for _, parcel := range storedParcels {
-		// в parcelMap лежат добавленные посылки, ключ - идентификатор посылки, значение - сама посылка
-		// убедитесь, что все посылки из storedParcels есть в parcelMap
-		require.NotEmpty(t, parcelMap)
-		// убедитесь, что значения полей полученных посылок заполнены верно
-		require.Equal(t, len(parcelMap), len(storedParcels))
-		for i := 0; i < len(parcelMap); i++ {
-			require.Equal(t, parcel, parcelMap[i])
-		}
+	for _, parcels := range storedParcels {
+		mapParcel := parcelMap[parcels.Number]
+		require.Equal(t, parcels, mapParcel)
 	}
 }

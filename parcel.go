@@ -34,10 +34,10 @@ func (s ParcelStore) Add(p Parcel) (int, error) {
 func (s ParcelStore) Get(number int) (Parcel, error) {
 	// реализуйте чтение строки по заданному number
 	// здесь из таблицы должна вернуться только одна строка
-	line := s.db.QueryRow("SELECT client, status, address, created_at FROM parcel WHERE number = :number", sql.Named("number", number))
+	line := s.db.QueryRow("SELECT number, client, status, address, created_at FROM parcel WHERE number = :number", sql.Named("number", number))
 	// заполните объект Parcel данными из таблицы
 	p := Parcel{}
-	err := line.Scan(&p.Client, &p.Status, &p.Address, &p.CreatedAt)
+	err := line.Scan(&p.Number, &p.Client, &p.Status, &p.Address, &p.CreatedAt)
 	if err != nil {
 		return Parcel{}, err
 	}
@@ -47,14 +47,14 @@ func (s ParcelStore) Get(number int) (Parcel, error) {
 func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 	// реализуйте чтение строк из таблицы parcel по заданному client
 	// здесь из таблицы может вернуться несколько строк
-	row, err := s.db.Query("SELECT client, status, address, created_at FROM parcel WHERE client = :client", sql.Named("client", client))
+	row, err := s.db.Query("SELECT number, client, status, address, created_at FROM Parcel WHERE client = :client", sql.Named("client", client))
 	if err != nil {
 		return []Parcel{}, err
 	}
 	var res []Parcel
 	for row.Next() {
 		p := Parcel{}
-		err := row.Scan(&p.Client, &p.Status, &p.Address, &p.CreatedAt)
+		err := row.Scan(&p.Number, &p.Client, &p.Status, &p.Address, &p.CreatedAt)
 		if err != nil {
 			return []Parcel{}, err
 		}
